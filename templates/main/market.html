@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+{% extends 'base_main.html'%}
+{% load static %}
+{% block content %}
+<div id="market">
+    <aside>
+        <menu>
+
+            <ul>
+
+                {% for type_data in type_datas %}
+
+                <li class="aside">
+                    <span class="yellowSlide"></span>
+                    <a href="/App/market_with_arg/{{ type_data.typeid }}/0/{{ sort_mode }}">{{ type_data.typename }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </menu>
+    </aside>
+    <!--    context = {
+            'title': title,
+            'type_datas': type_datas,
+            'goods_type_datas': goods_type_datas,
+            'child_category_datas': child_category_datas,
+            'goods_by_childcid_datas': goods_by_childcid_datas
+
+        }-->
+    <nav>
+        <ul>
+
+            <li><span id="alltypebtn">全部类型<span class="glyphicon glyphicon-chevron-down"></span></span></li>
+            <li><span id="showsortbtn">综合排序<span class="glyphicon glyphicon-chevron-down"></span></span></li>
+
+        </ul>
+    </nav>
+    <div>
+        <section>
+            <menu>
+                <ul>
+                    {% for goods_data in goods_datas %}
+                    <li>
+                        <a href="#">
+                            <img src="{{goods_data.productimg}}"/>
+                            <div class="shoppingInfo">
+                                <h6>{{goods_data.productlongname}}</h6>
+                                <p class="detailTag"><span>精选</span><span>{{goods_data.pedesc}}</span></p>
+                                <span class="unit">{{goods_data.specifics}}</span>
+                                <p class="price">
+                                    <span>￥{{goods_data.price}}</span><s><span>￥{{goods_data.marketprice}}</span></s>
+                                </p>
+                            </div>
+                        </a>
+                        <section>
+                            <button pID="{{goods_data.id}}" class="subShopping">-</button>
+<!--                            <span id="{{item.productid}}">{{item.num|default:0}}</span>-->
+
+<!--                            <span id="{{ goods_data.id }}">{{ goods_data.se }}</span>-->
+
+                            <span id="{{ goods_data.id }}" class="num">0</span>
+                            <button pID="{{goods_data.id}}" class="addShopping">+</button>
+                        </section>
+
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <div id="typediv">
+                    <div>
+                        {% for child_category_data in child_category_datas %}
+                        <a href="{% url 'App:market_with_arg' categoryid child_category_data.1 sort_mode %}"><span>{{ child_category_data.0 }}</span></a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div id="sortdiv">
+                    <div>
+                        <a href="/App/market_with_arg/{{categoryid}}/{{childcid}}/0/"
+                           class="sorta"><span>综合排序</span></a>
+                        <a href="{% url 'App:market_with_arg' categoryid childcid 1 %}" class="sorta"><span>销量排序</span></a>
+                        <a href="/App/market_with_arg/{{categoryid}}/{{childcid}}/2/"
+                           class="sorta"><span>价格最低</span></a>
+                        <a href="/App/market_with_arg/{{categoryid}}/{{childcid}}/3/"
+                           class="sorta"><span>价格最高</span></a>
+
+                    </div>
+                </div>
+            </menu>
+        </section>
+
+    </div>
+
+</div>
+{% endblock content%}
+{% block ext_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'axf/css/market_with_arg.css' %}">
+{% endblock ext_css %}
+{% block ext_js %}
+{{ block.super }}
+<script type="text/javascript" src="{% static 'axf/js/market_with_arg.js' %}"></script>
+{% endblock ext_js%}
+</body>
+</html>

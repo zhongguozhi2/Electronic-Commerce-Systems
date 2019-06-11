@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% extends 'base_order.html' %}
+{% load static %}
+{% block content %}
+{{ block.super }}
+<div id="order">
+    <h1><span>订单</span></h1>
+    <h2><span>{{ user.userName }}</span></h2>
+    <ul>
+        {% for Order in orders %}
+        <li><span>{{ Order.o_date }}</span></li>
+        {% for ordergood in Order.ordergoods_set.all %}
+
+        <li><span><img src="{{ ordergood.market_goods.productimg }}"><span>{{ ordergood.MarketGoods.productlongname }}</span><span>{{ ordergood.MarketGoods.price }}</span></span></li>
+        {% endfor %}
+        {% endfor %}
+    </ul>
+    <h2><span>总价：{{ Order.o_price }}</span></h2>
+</div>
+{% endblock content %}
+{% block ext_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'axf/css/order1.css' %}">
+{% endblock ext_css %}
+</body>
+</html>

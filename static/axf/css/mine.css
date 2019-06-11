@@ -1,0 +1,10 @@
+.username{
+    display: block;
+    position: fixed;
+    top: 3rem
+}
+.out{
+    display: block;
+    position: fixed;
+    top: 6rem
+}

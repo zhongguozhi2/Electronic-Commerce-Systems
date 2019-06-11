@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% extends 'base_main.html' %}
+{% load static %}
+
+{% block content %}
+<div id="home">
+
+<div class="swiper-container" id="topSwiper">
+    <div class="swiper-wrapper" >
+        {% for swiper_img in wheel_datas %}
+        <div class="swiper-slide"><a><img src="{{ swiper_img.img }}" alt="{{ swiper_img.name }}"></a></div>
+        {% endfor %}
+    </div>
+    <div class="swiper-pagination"></div><!--分页器。如果放置在swiper-container外面，需要自定义样式。-->
+
+</div>
+<div class="topMenu">
+    <nav>
+        <ul>
+            {% for nav_data in nav_datas %}
+                <li><img src="{{ nav_data.img }}" alt="{{ nav_data.name }}"></li>
+            {% endfor %}
+        </ul>
+    </nav>
+
+</div>
+<div class="swiper-container" id="swiperMenu">
+    <ul class="swiper-wrapper" >
+        {% for must_buy_data in must_buy_datas%}
+        <li class="swiper-slide"><img src="{{ must_buy_data.img }}"></li>
+        {% endfor %}
+    </ul>
+    <div class="swiper-pagination"></div><!--分页器。如果放置在swiper-container外面，需要自定义样式。-->
+
+</div>
+<div class="CVS">
+    <h2>
+        <img src="{{ shop0_1_datas.0.img }}" alt="{{ shop0_1_datas.0.name }}">
+    </h2>
+    <fieldset>
+        {% for shop1_3_data in shop1_3_datas %}
+
+        <a><img src="{{ shop1_3_data.img }}" alt="{{ shop1_3_data.name }}"></a>
+        {% endfor %}
+    </fieldset>
+    <ul>
+        {% for shop3_7_data in shop3_7_datas %}
+        <li>
+            <img src="{{ shop3_7_data.img }}" alt="{{ shop3_7_data.name }}">
+        </li>
+        {% endfor %}
+    </ul>
+    <ol>
+        {% for shop7_11_data in shop7_11_datas %}
+        <li>
+            <a href="#"><img src="{{ shop7_11_data.img }}" alt="{{ shop7_11_data.name }}"></a>
+        </li>
+        {% endfor %}
+    </ol>
+</div>
+    <div class="mainInfo">
+        {% for mainshow_data in mainshow_datas %}
+        <section>
+            <h3>
+                {{ mainshow_data.name }}
+                <a href="#"></a>
+                <span></span>
+            </h3>
+
+        </section>
+
+        <div>
+            <a><img src="{{ mainshow_data.img }}" alt="{{ mainshow_data.name }}"></a>
+        </div>
+        <section>
+            <ul>
+
+                <li>
+                    <a>
+                        <img src="{{ mainshow_data.img1 }}">
+
+
+                    </a>
+                    <p class="discription">{{ mainshow_data.longname1 }}</p>
+                    <a>
+                        <span>{{ mainshow_data.price1 }}</span>
+                        <s>{{ mainshow_data.marketprice1 }}</s>
+                    </a>
+                    <button>
+                        <span>+</span>
+                    </button>
+                </li>
+                <li>
+                    <a>
+                        <img src="{{ mainshow_data.img2 }}">
+
+
+                    </a>
+                    <p class="discription">{{ mainshow_data.longname2 }}</p>
+                    <a>
+                        <span>{{ mainshow_data.price2 }}</span>
+                        <s>{{ mainshow_data.marketprice2 }}</s>
+                    </a>
+                    <button>
+                        <span>+</span>
+                    </button>
+                </li>
+                <li>
+                    <a>
+                        <img src="{{ mainshow_data.img3 }}">
+
+
+                    </a>
+                    <p class="discription">{{ mainshow_data.longname3 }}</p>
+                    <a>
+                        <span>{{ mainshow_data.price3 }}</span>
+                        <s>{{ mainshow_data.marketprice3 }}</s>
+                    </a>
+                    <button>
+                        <span>+</span>
+                    </button>
+                </li>
+            </ul>
+        </section>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+{% block ext_css %}
+{{ block.super }}
+
+<link rel="stylesheet" href="{% static 'axf/css/home.css' %}">
+
+{% endblock %}
+{% block ext_js %}
+{{ block.super }}
+<script type="text/javascript" src="{% static 'js/swiper.jquery.js' %}"></script>
+<script type="text/javascript" src="{% static 'axf/js/home.js' %}"></script>
+
+
+{% endblock %}
+
+</body>
+</html>

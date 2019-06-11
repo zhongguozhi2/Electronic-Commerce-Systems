@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+{% extends 'base_main.html' %}
+{% load static %}
+{% block content %}
+<h1><span class="username">{{ username }}</span></h1>
+<!--<a href="{% url 'App:out' %}"><span class="out">退出登录</span></a>-->
+<p><span class="out">退出登陆</span></p>
+{% endblock content %}
+{% block ext_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'axf/css/mine.css' %}">
+{% endblock ext_css %}
+{% block ext_js %}
+{{ block.super }}
+<script type="text/javascript" src="{% static 'axf/js/mine.js' %}"></script>
+{% endblock ext_js %}
+</body>
+</html>

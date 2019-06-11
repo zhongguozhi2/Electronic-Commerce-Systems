@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% extends 'base.html' %}
+{% block content %}
+<form action="{% url 'App:login' %}" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <span><button>提交</button><a href="{% url 'App:register' %}">注册</a> </span>
+</form>
+{% endblock content %}
+</body>
+</html>
