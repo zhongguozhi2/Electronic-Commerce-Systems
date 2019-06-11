@@ -33,7 +33,7 @@ from .models import *
 class Home(ListView):
     """主页
 
-    展示项目的主要信息，包括：轮播展示部分热卖商品，商品导航栏，必买商品和超市，
+    展示项目的主要信息，包括：轮播展示部分热卖商品，商品导航栏，必买商品和超市
     """
     model = AxfHomeWheels
     template_name = 'main/Home.html'
