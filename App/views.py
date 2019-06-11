@@ -18,8 +18,8 @@ from django.template import loader
 from django.urls import reverse
 from django.contrib.auth import logout
 from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
-from django.views.generic import View, ListView, DetailView
+from django.views.decorators.cache import cache_page, never_cache
+from django.views.generic import View, ListView, DetailView, RedirectView
 from App.views_helper import HelperFun
 from GPAXF import settings
 from GPAXF.settings import COMPREHENSIVE_ORDER, SALES_QUANTITY_ORDER, PRICE_ASE_ORDER, \
@@ -159,14 +159,18 @@ class Register(View):
         return response
 
 
-class Quit(View):
+class Quit(RedirectView):
     """
     退出登陆,之后重定向到个人中心界面
     """
+    url = '/App/Mine/'
+    @method_decorator(never_cache)
+    def dispatch(self, request, *args, **kwargs):
+        return super(Quit, self).dispatch(request, *args, **kwargs)
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         logout(request)
-        return redirect('/App/Mine/')
+        return super(Quit, self).get(request, *args, **kwargs)
 
 
 class CheckUserId(View):
