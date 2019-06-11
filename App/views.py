@@ -19,6 +19,8 @@ from django.urls import reverse
 from django.contrib.auth import logout
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page, never_cache
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import View, ListView, DetailView, RedirectView
 from App.views_helper import HelperFun
 from GPAXF import settings
@@ -111,6 +113,12 @@ class MarketWithArgs(View):
 # 登陆界面
 class Login(LoginView):
     template_name = 'user/Login.html'
+
+    @method_decorator(never_cache)
+    @method_decorator(csrf_protect)
+    @method_decorator(sensitive_post_parameters('password'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(Login, self).dispatch(request, *args, **kwargs)
 
 
 class Register(View):
