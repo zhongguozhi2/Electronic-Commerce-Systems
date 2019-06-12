@@ -25,7 +25,7 @@ from django.views.generic import View, ListView, DetailView, RedirectView
 from App.views_helper import HelperFun
 from GPAXF import settings
 from GPAXF.settings import COMPREHENSIVE_ORDER, SALES_QUANTITY_ORDER, PRICE_ASE_ORDER, \
-    PRICE_DESC_ORDER, ADD_OPERATION, SUB_OPERATION
+    PRICE_DESC_ORDER, ADD_OPERATION, SUB_OPERATION, NOT_ALL_STATUS, ALL_STATUS
 from .models import *
 # Create your views here.
 
@@ -87,15 +87,15 @@ class MarketWithArgs(View):
                                             (typeid=category_id)[0].childtypenames.split('#')]]
         goods_by_cid_datas = goods_type_datas.filter(child_cid=child_cid)
         title = '闪购'
-        if child_cid == COMPREHENSIVE_ORDER:  # 综合排序
+        if child_cid is COMPREHENSIVE_ORDER:  # 综合排序
             goods_datas = goods_type_datas
         else:
             goods_datas = goods_by_cid_datas
-        if sort_mode == SALES_QUANTITY_ORDER:  # 按销售数量排序
+        if sort_mode is SALES_QUANTITY_ORDER:  # 按销售数量排序
             goods_datas = goods_datas.order_by("product_num")
-        if sort_mode == PRICE_ASE_ORDER:  # 按价格升序排序
+        if sort_mode is PRICE_ASE_ORDER:  # 按价格升序排序
             goods_datas = goods_datas.order_by("price")
-        if sort_mode == PRICE_DESC_ORDER:  # 按价格降序排序
+        if sort_mode is PRICE_DESC_ORDER:  # 按价格降序排序
             goods_datas = goods_datas.order_by("-price")
         context = {
             'title': title,
@@ -253,7 +253,7 @@ class Activate(View):
     """
 
     def get(self, request):
-        if cache.get('token') != request.GET['u_token']:
+        if cache.get('token') is not request.GET['u_token']:
             return HttpResponse("链接已失效")
         user = User.objects.get(userAccount=request.GET.get('u_Account'))
         user.if_activate = 1
@@ -277,9 +277,9 @@ class ChangeCart(View):
             c_goods_id=product).first()
         if cart1:
             nums = cart1.goods_nums
-            if int(operation) == ADD_OPERATION:  # ADD_OPERATION代表对购物车数量做加操作
+            if int(operation) is ADD_OPERATION:  # ADD_OPERATION代表对购物车数量做加操作
                 nums = nums + 1
-            if int(operation) == SUB_OPERATION:  # SUB_OPERATION代表对购物车数量做减操作
+            if int(operation) is SUB_OPERATION:  # SUB_OPERATION代表对购物车数量做减操作
                 if nums > 0:
                     nums = nums - 1
                 else:
@@ -335,11 +335,11 @@ class ChangeAllStatus(View):
     def get(self, request):
         state = request.GET.get('state')
         state = int(state)
-        if state == 1:
+        if state is ALL_STATUS:  # 全选状态
             for i in Cart.objects.all():
                 i.if_selected = False
                 i.save()
-        if state == 0:
+        if state is NOT_ALL_STATUS:  # 不是全选状态
             for j in Cart.objects.all():
                 j.if_selected = True
                 j.save()

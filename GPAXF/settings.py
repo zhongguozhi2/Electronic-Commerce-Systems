@@ -163,3 +163,7 @@ PRICE_DESC_ORDER = 3  # 价格降序
 # 对购物车的加减操作
 ADD_OPERATION = 0  # 对购物车数量做加操作
 SUB_OPERATION = 1  # 对购物车数量做减操作
+
+# 全选状态
+ALL_STATUS = 1  # 全选状态
+NOT_ALL_STATUS = 0  # 不是全选状态
