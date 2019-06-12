@@ -392,19 +392,19 @@ class AddOrder(HelperFun, View):
     """
 
     def get(self, request):
-        o = Order()
-        o.user = request.user_obj
-        o.o_price = super().get_total_price()
-        o.save()
+        order_obj = Order()
+        order_obj.user = request.user_obj
+        order_obj.o_price = super().get_total_price()
+        order_obj.save()
         for i in Cart.objects.filter(if_selected=True):
-            og = OrderGoods()
+            order_goods = OrderGoods()
             try:
-                o = Order.objects.get(id=o.id)
+                order_obj = Order.objects.get(id=o.id)
             except BaseException:
                 pass
-            og.order = o
-            og.market_goods = i.c_goods
-            og.save()
+            order_goods.order = order_obj
+            order_goods.market_goods = i.c_goods
+            order_goods.save()
         return redirect('/App/OrderAjax/')
 
 
