@@ -11,7 +11,7 @@ import time
 from App.models import Cart
 
 
-class HelperFun:
+class HelperMixin:
     """
     帮助函数类
 

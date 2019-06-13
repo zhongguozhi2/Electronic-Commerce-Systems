@@ -21,8 +21,10 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page, never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
-from django.views.generic import View, ListView, DetailView, RedirectView
-from App.views_helper import HelperFun
+from django.views.generic import View, ListView, DetailView, RedirectView, CreateView, FormView
+
+from App.form.user_form import RegisterForm
+from App.views_helper import HelperFun, HelperMixin
 from GPAXF import settings
 from GPAXF.settings import COMPREHENSIVE_ORDER, SALES_QUANTITY_ORDER, PRICE_ASE_ORDER, \
     PRICE_DESC_ORDER, ADD_OPERATION, SUB_OPERATION, NOT_ALL_STATUS, ALL_STATUS
@@ -32,12 +34,11 @@ from .models import *
 
 # 方法装饰器，指定装饰dispatch方法，可以应用到类，因为不管是什么类型的请求，都会走先走dispatch方法
 @method_decorator(cache_page(60), name='dispatch')
-class Home(ListView):
+class HomeView(ListView):
     """主页
 
     展示项目的主要信息，包括：轮播展示部分热卖商品，商品导航栏，必买商品和超市
     """
-    model = AxfHomeWheels
     template_name = 'main/Home.html'
 
     def get_queryset(self):
@@ -67,7 +68,7 @@ class Home(ListView):
 
 # 方法装饰器，指定装饰dispatch方法，可以应用到类，因为不管是什么类型的请求，都会走先走dispatch方法
 @method_decorator(cache_page(60), name='dispatch')
-class MarketWithArgs(View):
+class MarketWithArgsView(ListView):
     """商品展示页面
 
     展示项目的全部商品，根据不同的类别展示不同的商品，用户可以选择不同的排序方式，包括：综合排序
@@ -76,19 +77,23 @@ class MarketWithArgs(View):
     model = MarketGoods
     template_name = 'main/market.html'
 
-    def get(self, request, category_id, child_cid, sort_mode):
-        category_id = int(category_id)
-        child_cid = int(child_cid)
-        sort_mode = int(sort_mode)
+    def get_queryset(self):
+        goods_type_datas = super(MarketWithArgsView, self).get_queryset()
+        return goods_type_datas.filter(category_id=self.kwargs['category_id'])
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(MarketWithArgsView, self).get_context_data()
+        category_id = int(self.kwargs['category_id'])
+        child_cid = int(self.kwargs['child_cid'])
+        sort_mode = int(self.kwargs['sort_mode'])
         type_datas = GoodsType.objects.all()
-        goods_type_datas = MarketGoods.objects.filter(category_id=category_id)
         child_category_datas = [j for j in [i.split(':')  # 列表生成式方法取出子类的数据
                                             for i in GoodsType.objects.filter
                                             (typeid=category_id)[0].childtypenames.split('#')]]
-        goods_by_cid_datas = goods_type_datas.filter(child_cid=child_cid)
+        goods_by_cid_datas = self.get_queryset().filter(child_cid=child_cid)
         title = '闪购'
         if child_cid is COMPREHENSIVE_ORDER:  # 综合排序
-            goods_datas = goods_type_datas
+            goods_datas = self.get_queryset()
         else:
             goods_datas = goods_by_cid_datas
         if sort_mode is SALES_QUANTITY_ORDER:  # 按销售数量排序
@@ -97,17 +102,17 @@ class MarketWithArgs(View):
             goods_datas = goods_datas.order_by("price")
         if sort_mode is PRICE_DESC_ORDER:  # 按价格降序排序
             goods_datas = goods_datas.order_by("-price")
-        context = {
+        context = context.update({
             'title': title,
             'category_id': category_id,
             'child_cid': child_cid,
             'type_datas': type_datas,
-            'goods_type_datas': goods_type_datas,
+            'goods_type_datas': self.get_queryset(),
             'child_category_datas': child_category_datas,
             'goods_datas': goods_datas,
             'sort_mode': sort_mode,
-        }
-        return render(request, 'main/market.html', context=context)
+        })
+        return context
 
 
 # 登陆界面
@@ -121,39 +126,30 @@ class Login(LoginView):
         return super(Login, self).dispatch(request, *args, **kwargs)
 
 
-class Register(View):
+class RegisterView(FormView):
     """注册账号页面
 
     用户可以在这个页面注册账号
     ps：后端已完成，前端开发一部分，后面打算用vue来完善
     """
+    template_name = 'user/Register.html'
+    form_class = RegisterForm
+    success_url = '/App/MineView/'
 
-    def get(self, request):
-        context = {
-            'title': '注册',
-        }
-        return render(request, 'user/Register.html', context)
-
-    def post(self, request):
-        user_account = request.POST['userAccount']
-        user_password = request.POST['userPassword']
+    def form_valid(self, form):
         hash_password = hashlib.md5(
-            (user_password + 'salt').encode('utf-8')).hexdigest()
-        user_name = request.POST['userName']
-        user_phone = request.POST['userPhone']
-        user_address = request.POST['userAddress']
-        user_icon = request.FILES['userIcon']
-        user_icon1 = os.path.join(settings.MDEIA_ROOT, user_account + '.png')
+            (form.user_password + 'salt').encode('utf-8')).hexdigest()
+        user_icon1 = os.path.join(settings.MDEIA_ROOT, form.user_account + '.png')
         with open(user_icon1, "wb") as fp:
-            for i in user_icon.chunks():
+            for i in form.user_icon.chunks():
                 fp.write(i)
         user_rank = 1
-        User.createUser(user_account, hash_password, user_name, user_phone,
-                        user_icon1, user_address, user_rank).save()
+        User.createUser(form.user_account, hash_password, form.user_name, form.user_phone,
+                        user_icon1, form.user_address, user_rank).save()
         token = uuid.uuid4().hex  # uuid生成一个永不相等的随机字符串
         cache.set('token', token, 24 * 60 * 60)
-        activate_template = loader.get_template('user/email.html').\
-            render({'userAccount': user_account, 'token': token})
+        activate_template = loader.get_template('user/email.html'). \
+            render({'userAccount': form.user_account, 'token': token})
         # 发送邮件激活账号，这里用的是网易邮箱，后面可分离出来，加入其他激活方式
         send_mail(
             subject='Activate axf',
@@ -163,25 +159,23 @@ class Register(View):
                 'xiaozhizhi_0@163.com',
             ],
             html_message=activate_template)
-        response = redirect(reverse('App:Mine'))
-        return response
+        return super(RegisterView, self).form_valid(form)
 
-
-class Quit(RedirectView):
+class QuitView(RedirectView):
     """
     退出登陆,之后重定向到个人中心界面
     """
     url = '/App/Mine/'
     @method_decorator(never_cache)
     def dispatch(self, request, *args, **kwargs):
-        return super(Quit, self).dispatch(request, *args, **kwargs)
+        return super(QuitView, self).dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         logout(request)
-        return super(Quit, self).get(request, *args, **kwargs)
+        return super(QuitView, self).get(request, *args, **kwargs)
 
 
-class CheckUserId(View):
+class CheckUserIdView(View):
     """
     在用户注册账号的时候检查用户名是否已经注册过了，使用的技术是ajax预校验
     """
@@ -195,7 +189,7 @@ class CheckUserId(View):
             return JsonResponse({"data": "可以注册", "status": "success"})
 
 
-class Mine(DetailView):
+class MineView(DetailView):
     """ 用户的个人中心展示界面
 
     展示用户的信息，目前只展示了用户的用户名、头像等基本信息，后面添加更多有用的信息
@@ -211,14 +205,16 @@ class Mine(DetailView):
             return redirect("/App/Login/")
         else:
             self.username = user.userName
+        return super(MineView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context['username'] = self.username
         context['title'] = '我的'
+        return context
 
 
-class CartPage(HelperFun, ListView):
+class CartView(HelperMixin, ListView):
     """购物车页面
 
     这个页面展示用户在market_with_args页面添加的商品，显示的主要有用户的信
@@ -227,25 +223,25 @@ class CartPage(HelperFun, ListView):
     """
     model = Cart
     template_name = 'main/Cart.html'
+    context_object_name = 'carts'
 
     def get_queryset(self):
-        self.carts = Cart.objects.all()
-        if Cart.objects.filter(if_selected=False).exists():
+        carts = super(CartView, self).get_queryset()
+        if carts.filter(if_selected=False).exists():
             self.if_all_select = False
         else:
             self.if_all_select = True
-        self.total_price = super().get_total_price()
-
+        self.total_price = super(CartView, self).get_total_price()
+        return carts
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context['total_price'] = self.total_price
         context['if_all_select'] = self.if_all_select
-        context['carts'] = self.carts
         context['title'] = '购物车'
         return context
 
 
-class Activate(View):
+class ActivateView(View):
     """激活账号
 
     通过发送邮箱的方式激活已经注册好的账号
@@ -261,7 +257,7 @@ class Activate(View):
         return redirect('/App/Login')
 
 
-class ChangeCart(View):
+class ChangeCartView(View):
     """
     通过ajax修改购物车的数据
     """
@@ -301,7 +297,7 @@ class ChangeCart(View):
         return JsonResponse(data=data)
 
 
-class ChangeStatus(View):
+class ChangeStatusView(View):
     """
     通过ajax改变商品选中的状态
     """
@@ -327,7 +323,7 @@ class ChangeStatus(View):
         return JsonResponse(data=data)
 
 
-class ChangeAllStatus(View):
+class ChangeAllStatusView(View):
     """
     通过ajax改变购物车中所有选中的状态
     """
@@ -349,7 +345,7 @@ class ChangeAllStatus(View):
         return JsonResponse(data=data)
 
 
-class ChangeCartNum(View):
+class ChangeCartNumView(View):
     """
     通过ajax修改购物车商品的数量
     """
@@ -370,7 +366,7 @@ class ChangeCartNum(View):
         return JsonResponse(data=data)
 
 
-class OrderAjax(View):
+class OrderAjaxView(View):
     """
     通过ajax对订单里面的商品进行排序
     """
@@ -386,7 +382,7 @@ class OrderAjax(View):
         return render(request, 'Order/Order.html/', context=data)
 
 
-class AddOrder(HelperFun, View):
+class AddOrderView(HelperFun, View):
     """
     通过ajax添加一个订单记录，添加之后重定向到订单页面
     """

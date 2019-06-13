@@ -7,6 +7,8 @@
 
 from django import forms
 
+from App.models import User
+
 
 class LoginForm(forms.Form):
     """
@@ -22,3 +24,14 @@ class LoginForm(forms.Form):
         min_length=6,
         required=True,
         widget=forms.PasswordInput)
+
+
+class RegisterForm(forms.ModelForm):
+    """
+    注册表单
+    """
+    class Meta:
+        model = User
+        fields = ['userAccount', 'userPassword', 'userName',
+                  'userToken', 'userIcon', 'userRank',
+                  'userPhone', 'user_address', ]
