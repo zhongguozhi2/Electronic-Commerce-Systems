@@ -200,7 +200,7 @@ class MineView(DetailView):
     def get(self, request, *args, **kwargs):
         try:
             request_token = request.session.get('tok')  # 验证token
-            user = User.objects.get(userToken=request_token)
+            user = User.objecs.get(userToken=request_token)
         except User.DoesNotExist:
             return redirect("/App/Login/")
         else:
@@ -382,7 +382,7 @@ class OrderAjaxView(View):
         return render(request, 'Order/Order.html/', context=data)
 
 
-class AddOrderView(HelperFun, View):
+class AddOrderView(HelperMixin, View):
     """
     通过ajax添加一个订单记录，添加之后重定向到订单页面
     """
