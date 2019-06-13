@@ -3,14 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="1b2f934d-608d-4e7e-94fa-d27c4dad99d7" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/App/form/user_form.py" beforeDir="false" afterPath="$PROJECT_DIR$/App/form/user_form.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/App/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/App/tests.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/App/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/App/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/App/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/App/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/App/views_helper.py" beforeDir="false" afterPath="$PROJECT_DIR$/App/views_helper.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GPAXF/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/GPAXF/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/css/bootstrap.css.map" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/bootstrap.css.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/css/bootstrap.min.css.map" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/bootstrap.min.css.map" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -163,7 +155,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="995" />
     <option name="y" value="50" />
     <option name="width" value="920" />
@@ -262,7 +254,7 @@
       <workItem from="1560262024201" duration="2789000" />
       <workItem from="1560317694312" duration="954000" />
       <workItem from="1560321217285" duration="2899000" />
-      <workItem from="1560434667095" duration="8919000" />
+      <workItem from="1560434667095" duration="9160000" />
     </task>
     <task id="LOCAL-00001" summary="优化退出登陆类代码">
       <created>1560262751636</created>
@@ -278,14 +270,21 @@
       <option name="project" value="LOCAL" />
       <updated>1560265006578</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="参考了generic view和github上排名较高的源码，优化了类命名，和组织结构。">
+      <created>1560443841436</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1560443841436</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="15561000" />
+    <option name="totallyTimeSpent" value="15802000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
+    <frame x="-7" y="-7" width="1550" height="838" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.11997319" />
@@ -319,7 +318,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="优化退出登陆类代码" />
     <MESSAGE value="优化登陆代码" />
-    <option name="LAST_COMMIT_MESSAGE" value="优化登陆代码" />
+    <MESSAGE value="参考了generic view和github上排名较高的源码，优化了类命名，和组织结构。" />
+    <option name="LAST_COMMIT_MESSAGE" value="参考了generic view和github上排名较高的源码，优化了类命名，和组织结构。" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/GPAXF/settings.py">
