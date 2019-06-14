@@ -220,7 +220,7 @@ class MineView(DetailView):
     def get(self, request, *args, **kwargs):
         try:
             request_token = request.session.get('tok')  # 验证token
-            user = User.objects.get(userToken=request_token)
+            user = User.objecs.get(userToken=request_token)
         except User.DoesNotExist:
             return redirect("/App/Login/")
         else:
