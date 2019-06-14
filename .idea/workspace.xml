@@ -3,11 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="1b2f934d-608d-4e7e-94fa-d27c4dad99d7" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/App/form/user_form.py" beforeDir="false" afterPath="$PROJECT_DIR$/App/form/user_form.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/App/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/App/migrations/0001_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/App/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/App/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/App/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/App/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/middleware/middleware.py" beforeDir="false" afterPath="$PROJECT_DIR$/middleware/middleware.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -20,8 +15,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/App/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="48" column="28" lean-forward="true" selection-start-line="48" selection-start-column="28" selection-end-line="48" selection-end-column="28" />
+            <state relative-caret-position="303">
+              <caret line="302" column="35" lean-forward="true" selection-start-line="302" selection-start-column="35" selection-end-line="302" selection-end-column="35" />
               <folding>
                 <element signature="e#121#130#0" expanded="true" />
               </folding>
@@ -162,7 +157,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="995" />
     <option name="y" value="50" />
     <option name="width" value="920" />
@@ -262,7 +257,7 @@
       <workItem from="1560317694312" duration="954000" />
       <workItem from="1560321217285" duration="2899000" />
       <workItem from="1560434667095" duration="9465000" />
-      <workItem from="1560508337110" duration="3957000" />
+      <workItem from="1560508337110" duration="4198000" />
     </task>
     <task id="LOCAL-00001" summary="优化退出登陆类代码">
       <created>1560262751636</created>
@@ -285,14 +280,21 @@
       <option name="project" value="LOCAL" />
       <updated>1560443841436</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="参考了generic view和github上排名较高的源码，优化了类命名，和组织结构。">
+      <created>1560512545388</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1560512545388</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="20064000" />
+    <option name="totallyTimeSpent" value="20305000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
+    <frame x="-7" y="-7" width="1550" height="838" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.121313676" />
@@ -446,8 +448,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/App/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="48" column="28" lean-forward="true" selection-start-line="48" selection-start-column="28" selection-end-line="48" selection-end-column="28" />
+        <state relative-caret-position="303">
+          <caret line="302" column="35" lean-forward="true" selection-start-line="302" selection-start-column="35" selection-end-line="302" selection-end-column="35" />
           <folding>
             <element signature="e#121#130#0" expanded="true" />
           </folding>
