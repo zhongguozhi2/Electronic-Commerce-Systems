@@ -24,7 +24,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import View, ListView, DetailView, RedirectView, CreateView, FormView
 
 from App.form.user_form import RegisterForm
-from App.views_helper import HelperFun, HelperMixin
+from App.views_helper import HelperMixin
 from GPAXF import settings
 from GPAXF.settings import COMPREHENSIVE_ORDER, SALES_QUANTITY_ORDER, PRICE_ASE_ORDER, \
     PRICE_DESC_ORDER, ADD_OPERATION, SUB_OPERATION, NOT_ALL_STATUS, ALL_STATUS
@@ -39,10 +39,11 @@ class HomeView(ListView):
 
     展示项目的主要信息，包括：轮播展示部分热卖商品，商品导航栏，必买商品和超市
     """
+    model = AxfHomeMainShow
     template_name = 'main/Home.html'
+    extra_context = {'title': '主页'}
 
     def get_queryset(self):
-        self.title = '主页'
         self.wheel_datas = AxfHomeWheels.objects.all()
         self.nav_datas = AxfHomeNav.objects.all()
         self.must_buy_datas = AxfHomeMustBuy.objects.all()
@@ -51,11 +52,9 @@ class HomeView(ListView):
         self.shop1_3_datas = self.shop_datas[1:3]  # 取出热卖商品对象
         self.shop3_7_datas = self.shop_datas[3:7]  # 取出分类商品对象
         self.shop7_11_datas = self.shop_datas[7:11]  # 取出超市商品对象
-        self.mainshow_datas = AxfHomeMainShow.objects.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        context['title'] = self.title
         context['nav_datas'] = self.nav_datas
         context['wheel_datas'] = self.wheel_datas
         context['must_buy_datas'] = self.must_buy_datas
@@ -63,7 +62,6 @@ class HomeView(ListView):
         context['shop1_3_datas'] = self.shop1_3_datas
         context['shop3_7_datas'] = self.shop3_7_datas
         context['shop7_11_datas'] = self.shop7_11_datas
-        context['mainshow_datas'] = self.mainshow_datas
         return context
 
 # 方法装饰器，指定装饰dispatch方法，可以应用到类，因为不管是什么类型的请求，都会走先走dispatch方法
@@ -76,6 +74,7 @@ class MarketWithArgsView(ListView):
     """
     model = MarketGoods
     template_name = 'main/market.html'
+    extra_context = {'title': '闪购'}
 
     def get_queryset(self):
         goods_type_datas = super(MarketWithArgsView, self).get_queryset()
@@ -91,7 +90,6 @@ class MarketWithArgsView(ListView):
                                             for i in GoodsType.objects.filter
                                             (typeid=category_id)[0].childtypenames.split('#')]]
         goods_by_cid_datas = self.get_queryset().filter(child_cid=child_cid)
-        title = '闪购'
         if child_cid is COMPREHENSIVE_ORDER:  # 综合排序
             goods_datas = self.get_queryset()
         else:
@@ -103,7 +101,6 @@ class MarketWithArgsView(ListView):
         if sort_mode is PRICE_DESC_ORDER:  # 按价格降序排序
             goods_datas = goods_datas.order_by("-price")
         context = context.update({
-            'title': title,
             'category_id': category_id,
             'child_cid': child_cid,
             'type_datas': type_datas,
@@ -126,30 +123,52 @@ class Login(LoginView):
         return super(Login, self).dispatch(request, *args, **kwargs)
 
 
-class RegisterView(FormView):
+class RegisterView(CreateView):
     """注册账号页面
 
     用户可以在这个页面注册账号
     ps：后端已完成，前端开发一部分，后面打算用vue来完善
     """
     template_name = 'user/Register.html'
-    form_class = RegisterForm
     success_url = '/App/MineView/'
+    model = User
+    fields = ['user_account', 'user_password', 'user_address',
+              'user_phone', 'user_name', 'user_icon', 'user_rank',
+              'user_token', 'if_activate', ]
 
     def form_valid(self, form):
-        hash_password = hashlib.md5(
-            (form.user_password + 'salt').encode('utf-8')).hexdigest()
-        user_icon1 = os.path.join(settings.MDEIA_ROOT, form.user_account + '.png')
-        with open(user_icon1, "wb") as fp:
-            for i in form.user_icon.chunks():
+        # 更改默认ModelForm的user_password值，使用hash摘要算法加密注册密码，防止内部人员看到密码
+        super(
+            RegisterView,
+            self).kwargs['user_password'] = hashlib.md5(
+            (super(
+                RegisterView,
+                self).kwargs['user_password'] +
+                'salt').encode('utf-8')).hexdigest()
+        self.storage_path()
+        self.send_email()
+        return super(RegisterView, self).form_valid(form)
+
+    def storage_path(self):
+        """
+        存储头像
+        :return:
+        """
+        storage_path = os.path.join(settings.MDEIA_ROOT, super(
+            RegisterView, self).kwargs['user_account'] + '.png')
+        with open(storage_path, "wb") as fp:
+            for i in super(RegisterView, self).kwargs['user_icon'].chunks():
                 fp.write(i)
-        user_rank = 1
-        User.createUser(form.user_account, hash_password, form.user_name, form.user_phone,
-                        user_icon1, form.user_address, user_rank).save()
+
+    def send_email(self):
+        """
+        发送email，用于激活账户
+        :return:
+        """
         token = uuid.uuid4().hex  # uuid生成一个永不相等的随机字符串
         cache.set('token', token, 24 * 60 * 60)
-        activate_template = loader.get_template('user/email.html'). \
-            render({'userAccount': form.user_account, 'token': token})
+        activate_template = loader.get_template('user/email.html'). render(
+            {'user_account': super(RegisterView, self).kwargs['user_account'], 'token': token})
         # 发送邮件激活账号，这里用的是网易邮箱，后面可分离出来，加入其他激活方式
         send_mail(
             subject='Activate axf',
@@ -159,7 +178,7 @@ class RegisterView(FormView):
                 'xiaozhizhi_0@163.com',
             ],
             html_message=activate_template)
-        return super(RegisterView, self).form_valid(form)
+
 
 class QuitView(RedirectView):
     """
@@ -196,6 +215,7 @@ class MineView(DetailView):
     """
     model = User
     template_name = 'main/Mine.html'
+    extra_context = {'title': '我的'}
 
     def get(self, request, *args, **kwargs):
         try:
@@ -204,13 +224,12 @@ class MineView(DetailView):
         except User.DoesNotExist:
             return redirect("/App/Login/")
         else:
-            self.username = user.userName
+            self.user_name = user.user_name
         return super(MineView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        context['username'] = self.username
-        context['title'] = '我的'
+        context['username'] = self.user_name
         return context
 
 
@@ -233,6 +252,7 @@ class CartView(HelperMixin, ListView):
             self.if_all_select = True
         self.total_price = super(CartView, self).get_total_price()
         return carts
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context['total_price'] = self.total_price
@@ -271,7 +291,7 @@ class ChangeCartView(View):
         cart1 = Cart.objects.filter(
             c_user=request.user_obj).filter(
             c_goods_id=product).first()
-        if cart1:
+        if cart1.exists():
             nums = cart1.goods_nums
             if int(operation) is ADD_OPERATION:  # ADD_OPERATION代表对购物车数量做加操作
                 nums = nums + 1
@@ -382,7 +402,7 @@ class OrderAjaxView(View):
         return render(request, 'Order/Order.html/', context=data)
 
 
-class AddOrderView(HelperFun, View):
+class AddOrderView(HelperMixin, View):
     """
     通过ajax添加一个订单记录，添加之后重定向到订单页面
     """

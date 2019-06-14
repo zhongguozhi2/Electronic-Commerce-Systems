@@ -24,8 +24,8 @@ class LoginMiddleware(MiddlewareMixin):
             print(key, value)
         # 如果请求的方式是ajax
         if request.path in is_ajax or request.path in no_ajax:
-            if request.session.get("userAccount"):
-                user_account = request.session.get("userAccount")
+            if request.session.get("user_account"):
+                user_account = request.session.get("user_account")
                 try:
                     user = User.objects.get(userAccount=user_account)
                     request.user_obj = user

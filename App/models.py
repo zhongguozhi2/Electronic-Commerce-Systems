@@ -142,20 +142,20 @@ class User(models.Model):
     """
     映射为用户表
     """
-    userAccount = models.CharField(max_length=20, unique=True)
-    userPassword = models.CharField(max_length=50)
-    userName = models.CharField(max_length=20)
-    userPhone = models.CharField(max_length=20)
-    userIcon = models.CharField(max_length=256)
+    user_account = models.CharField(max_length=20, unique=True)
+    user_password = models.CharField(max_length=50)
+    user_name = models.CharField(max_length=20)
+    user_phone = models.CharField(max_length=20)
+    user_icon = models.CharField(max_length=256)
     user_address = models.CharField(max_length=56)
-    userRank = models.IntegerField(default=1)
-    userToken = models.CharField(max_length=50)
+    user_rank = models.IntegerField(default=1)
+    user_token = models.CharField(max_length=50)
     if_activate = models.BooleanField(default=0)
     @classmethod
     def create_user(cln, accout, password, name, phone, icon, address, rank):
-        return cln(userAccount=accout, userPassword=password, userName=name,
-                   userPhone=phone, userIcon=icon, userAdderss=address,
-                   userRank=rank)
+        return cln(user_account=accout, user_password=password, user_name=name,
+                   user_phone=phone, user_icon=icon, user_adderss=address,
+                   user_rank=rank)
 
 
 class Cart(models.Model):
