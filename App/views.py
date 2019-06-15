@@ -52,6 +52,7 @@ class HomeView(ListView):
         self.shop1_3_datas = self.shop_datas[1:3]  # 取出热卖商品对象
         self.shop3_7_datas = self.shop_datas[3:7]  # 取出分类商品对象
         self.shop7_11_datas = self.shop_datas[7:11]  # 取出超市商品对象
+        return super(HomeView, self).get_queryset()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
@@ -243,6 +244,7 @@ class CartView(HelperMixin, ListView):
     model = Cart
     template_name = 'main/Cart.html'
     context_object_name = 'carts'
+    extra_context = {'title': '购物车'}
 
     def get_queryset(self):
         carts = super(CartView, self).get_queryset()
@@ -257,7 +259,6 @@ class CartView(HelperMixin, ListView):
         context = super().get_context_data()
         context['total_price'] = self.total_price
         context['if_all_select'] = self.if_all_select
-        context['title'] = '购物车'
         return context
 
 
