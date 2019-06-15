@@ -1,0 +1,17 @@
+base.py: ContextMixin View TemplateResponseMixin TemplateView(TemplateResponseMixin, ContextMixin, View) RedirectView(View)
+
+
+detail.py: SingleObjectMixin(ContextMixin) BaseDetailView(SingleObjectMixin, View) 
+SingleObjectTemplateResponseMixin(TemplateResponseMixin)
+DetailView(SingleObjectTemplateResponseMixin, BaseDetailView)
+
+list.py: MultipleObjectMixin(ContextMixin) BaseListView(MultipleObjectMixin, View) 
+MultipleObjectTemplateResponseMixin(TemplateResponseMixin)
+ListView(MultipleObjectTemplateResponseMixin, BaseListView)
+
+edit.py FormMixin(ContextMixin) ModelFormMixin(FormMixin, SingleObjectMixin) ProcessFormView(View)
+BaseFormView(FormMixin, ProcessFormView) FormView(TemplateResponseMixin, BaseFormView)
+BaseCreateView(ModleFormMixin, ProcessFormView) CreateView(SingleObjectTemplateResponseMixin, BaseCreateVIew)
+BaseUpdateView(ModelFormMixin, ProcessFormView) UpdateView(SingleObjectTemplateResponseMixin, BaseUpateView)
+DeletionMixin BaseDeleteView(DeletionMixin, BaseDetailView) DeleteView(SingleObjectTemplateResponseMixin, BaseDeleteView)
+ 
