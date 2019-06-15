@@ -1,0 +1,35 @@
+﻿base.py模块包括的类视图：
+ContextMixin 
+View 
+TemplateResponseMixin
+TemplateView(TemplateResponseMixin, ContextMixin, View) 
+RedirectView(View)
+模块总结：base.py模块包括一些基础的类视图，供其他类视图直接或间接的继承
+
+detail.py模块包括的类视图： 
+SingleObjectMixin(ContextMixin) 
+BaseDetailView(SingleObjectMixin, View) 
+SingleObjectTemplateResponseMixin(TemplateResponseMixin)
+DetailView(SingleObjectTemplateResponseMixin, BaseDetailView)
+模块总结：detail.py模块是用于单个对象的类视图模块，多用于单个对象的展示
+
+list.py模块包括的类视图： 
+MultipleObjectMixin(ContextMixin) 
+BaseListView(MultipleObjectMixin, View) 
+MultipleObjectTemplateResponseMixin(TemplateResponseMixin)
+ListView(MultipleObjectTemplateResponseMixin, BaseListView)
+模块总结：list.py模块是用于多个对象的类视图模块，多用于多个对象的列表展示
+
+edit.py模块包括的类视图： 
+FormMixin(ContextMixin) 
+ModelFormMixin(FormMixin, SingleObjectMixin) 
+ProcessFormView(View)
+BaseFormView(FormMixin, ProcessFormView) 
+FormView(TemplateResponseMixin, BaseFormView)
+BaseCreateView(ModleFormMixin, ProcessFormView) 
+CreateView(SingleObjectTemplateResponseMixin, BaseCreateVIew)
+BaseUpdateView(ModelFormMixin, ProcessFormView) 
+UpdateView(SingleObjectTemplateResponseMixin, BaseUpateView)
+DeletionMixin BaseDeleteView(DeletionMixin, BaseDetailView) 
+DeleteView(SingleObjectTemplateResponseMixin, BaseDeleteView)
+模块总结 ：edit.py模块是用于编辑的类视图，多用于处理普通表单和模型表单
