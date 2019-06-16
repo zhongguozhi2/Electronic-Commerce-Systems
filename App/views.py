@@ -21,7 +21,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page, never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
-from django.views.generic import View, ListView, DetailView, RedirectView, CreateView, FormView
+from django.views.generic import View, ListView, DetailView, RedirectView, CreateView, FormView, UpdateView
 
 from App.form.user_form import RegisterForm
 from App.views_helper import HelperMixin
@@ -262,108 +262,129 @@ class CartView(HelperMixin, ListView):
         return context
 
 
-class ActivateView(View):
+class ActivateView(RedirectView):
     """激活账号
 
     通过发送邮箱的方式激活已经注册好的账号
     ps：目前提供的是网易邮箱激活，后面可以加入信息激活或者电话激活之类的
     """
+    pattern_name = 'Login'
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         if cache.get('token') is not request.GET['u_token']:
             return HttpResponse("链接已失效")
         user = User.objects.get(userAccount=request.GET.get('u_Account'))
         user.if_activate = 1
         user.save()
-        return redirect('/App/Login')
+        return super(ActivateView, self).get(self, request, *args, **kwargs)
 
 
-class ChangeCartView(View):
+class AjaxResponseMixin:
+    """
+    对于一个表单，增加一个Ajax支持
+    """
+
+    def form_invalid(self, form):
+        response = super().form_invalid(form)
+        if self.request.is_ajax():
+            return JsonResponse(form.errors, status=400)
+        else:
+            return response
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.request.is_ajax():
+            data = {
+                'pk': self.object.pk,
+            }
+            return JsonResponse(data)
+        else:
+            return response
+
+
+class ChangeCartView(AjaxResponseMixin, UpdateView):
     """
     通过ajax修改购物车的数据
     """
+    model = Cart
+    fields = ['goods_nums', 'c_user', 'c_goods']
 
-    def post(self, request, operation):
-        p_id = request.POST.get("p_id")
+    def get_object(self, queryset=None):
+        object_with_filter = super(ChangeCartView, self).get_object()
+        p_id = self.request.POST.get("p_id")
         try:
             product = MarketGoods.objects.get(id=p_id)
         except BaseException:
             pass
-        cart1 = Cart.objects.filter(
-            c_user=request.user_obj).filter(
+        object_with_filter = object_with_filter.filter(
+            c_user=self.request.user_obj).filter(
             c_goods_id=product).first()
-        if cart1.exists():
-            nums = cart1.goods_nums
-            if int(operation) is ADD_OPERATION:  # ADD_OPERATION代表对购物车数量做加操作
+        return object_with_filter
+
+    def form_valid(self, form):
+
+        if self.object.exists():
+            nums = self.object.goods_nums
+            if int(self.kwargs['operation']
+                   ) is ADD_OPERATION:  # ADD_OPERATION代表对购物车数量做加操作
                 nums = nums + 1
-            if int(operation) is SUB_OPERATION:  # SUB_OPERATION代表对购物车数量做减操作
+            if int(self.kwargs['operation']
+                   ) is SUB_OPERATION:  # SUB_OPERATION代表对购物车数量做减操作
                 if nums > 0:
                     nums = nums - 1
                 else:
                     nums = 0
-            cart1.goods_nums = nums
-            cart1.save()
+            form.instance.goods_nums = nums
         else:
-            cart2 = Cart()
-            cart2.c_user = request.user_obj
-            cart2.c_goods = product
-            cart2.save()
-            nums = cart2.goods_nums
-        request.session['nums'] = nums
-        data = {
-            "status": 200,
-            "msg": "成功",
-            "nums": nums
-        }
-        return JsonResponse(data=data)
+            form.instance.c_user = self.request.user_obj
+            form.instance.c_goods = self.request.product
+            nums = self.object.goods_nums
+        self.request.session['nums'] = nums
+        return super(ChangeCartView, self).form_valid(form)
 
 
-class ChangeStatusView(View):
+class ChangeStatusView(AjaxResponseMixin, UpdateView):
     """
     通过ajax改变商品选中的状态
     """
+    model = Cart
+    fields = ['if_selected']
 
-    def post(self, request):
-        cart_id = request.POST.get('cart_id')
-        cart_id = int(cart_id)
-        try:
-            cart1 = Cart.objects.get(pk=cart_id)
-        except BaseException:
-            pass
-        cart1.if_selected = not cart1.if_selected
-        cart1.save()
-        if Cart.objects.filter(if_selected=False).exists():
+    def form_valid(self, form):
+        form.instance.if_selected = not self.object.if_selected
+        if self.object.filter(if_selected=False).exists():
             if_all_select = False
         else:
             if_all_select = True
+        # 重新给AjaxResponseMixin中的data赋值
         data = {
             'status': 200,
-            'is_select': cart1.if_selected,
+            'is_select': self.object.if_selected,
             'if_all_select': if_all_select,
         }
-        return JsonResponse(data=data)
+        return super(ChangeStatusView, self).form_valid(form)
 
 
-class ChangeAllStatusView(View):
+class ChangeAllStatusView(AjaxResponseMixin, UpdateView):
     """
     通过ajax改变购物车中所有选中的状态
     """
+    model = Cart
+    fields = ['if_selected']
+    def form_valid(self, form):
 
-    def get(self, request):
-        state = request.GET.get('state')
+        state = self.kwargs.get('state')
         state = int(state)
         if state is ALL_STATUS:  # 全选状态
             for i in Cart.objects.all():
                 i.if_selected = False
-                i.save()
         if state is NOT_ALL_STATUS:  # 不是全选状态
             for j in Cart.objects.all():
                 j.if_selected = True
-                j.save()
         data = {
             'status': 200
         }
-        return JsonResponse(data=data)
+        return super(ChangeAllStatusView, self).form_valid(form)
 
 
 class ChangeCartNumView(View):
@@ -387,6 +408,29 @@ class ChangeCartNumView(View):
         return JsonResponse(data=data)
 
 
+class AddOrderView(HelperMixin, RedirectView, UpdateView):
+    """
+    通过ajax添加一个订单记录，添加之后重定向到订单页面
+    """
+    model = Order
+    pattern_name = 'OrderAjax'
+    fields = ['order', 'user', 'o_price', 'market_goods']
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user_obj
+        form.instance.o_price = super().get_total_price()
+        for i in Cart.objects.filter(if_selected=True):
+            order_goods = OrderGoods()
+            try:
+                order_obj = Order.objects.get(id=self.pk_url_kwarg)
+            except BaseException:
+                pass
+            form.instance.order = order_obj
+            form.instance.market_goods = i.c_goods
+
+        return super(AddOrderView, self).form_valid(form)
+
+
 class OrderAjaxView(View):
     """
     通过ajax对订单里面的商品进行排序
@@ -401,28 +445,6 @@ class OrderAjaxView(View):
             'orders': orders,
         }
         return render(request, 'Order/Order.html/', context=data)
-
-
-class AddOrderView(HelperMixin, View):
-    """
-    通过ajax添加一个订单记录，添加之后重定向到订单页面
-    """
-
-    def get(self, request):
-        order_obj = Order()
-        order_obj.user = request.user_obj
-        order_obj.o_price = super().get_total_price()
-        order_obj.save()
-        for i in Cart.objects.filter(if_selected=True):
-            order_goods = OrderGoods()
-            try:
-                order_obj = Order.objects.get(id=o.id)
-            except BaseException:
-                pass
-            order_goods.order = order_obj
-            order_goods.market_goods = i.c_goods
-            order_goods.save()
-        return redirect('/App/OrderAjax/')
 
 
 def market(request):
